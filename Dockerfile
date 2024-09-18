@@ -1,12 +1,20 @@
-FROM alpine:latest
+FROM ruby:3.3.3-alpine
 
-# This Dockerfile is optimized for go binaries, change it as much as necessary
-# for your language of choice.
+# Install dependencies
+RUN apk update && apk add --no-cache build-base sqlite-dev
 
-RUN apk --no-cache add ca-certificates libc6-compat
+# Set up the working directory
+WORKDIR /app
+COPY Gemfile Gemfile.lock ./
 
+# Install gems
+RUN bundle install
+
+# Add the application code
+COPY . .
+
+# Expose port 9091
 EXPOSE 9091
 
-COPY car-pooling-challenge /
-
-ENTRYPOINT [ "/car-pooling-challenge" ]
+# Command to run the rails server
+CMD [ "bin/rails", "server", "-b", "0.0.0.0", "-p", "9091" ]

@@ -9,4 +9,5 @@ Rails.application.routes.draw do
     post 'dropoff', to: 'car_pooling#dropoff_group'
     post 'locate',  to: 'car_pooling#locate_group'
   end
+  match '*path', to: 'application#method_not_allowed', via: :all
 end

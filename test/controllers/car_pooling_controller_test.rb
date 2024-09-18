@@ -13,7 +13,7 @@ class CarPoolingControllerTest < ActionController::TestCase
 
   test "load_cars" do
     # Load the list of available cars
-    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] })
+    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] }, as: :json)
     assert_response 200
 
     # When there is a failure in the request
@@ -22,7 +22,7 @@ class CarPoolingControllerTest < ActionController::TestCase
   end
 
   test "perform_journey" do
-    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] })
+    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] }, as: :json)
 
     # When the group is registered correctly
     post(:perform_journey, params: { id: 1, people: 4 })
@@ -34,15 +34,16 @@ class CarPoolingControllerTest < ActionController::TestCase
   end
 
   test "dropoff_group" do
-    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] })
+    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] }, as: :json)
     post(:perform_journey, params: { id: 1, people: 4 })
+    @request.content_type = 'application/x-www-form-urlencoded'
 
     # When the group is unregistered correctly
-    post(:dropoff_group, params: { id: 1 })
+    post(:dropoff_group, params: { ID: 1 })
     assert_response 200
 
     # When the group is not to be found
-    post(:dropoff_group, params: { id: 2 })
+    post(:dropoff_group, params: { ID: 2 })
     assert_response 404
 
     # When there is a failure in the request
@@ -51,24 +52,25 @@ class CarPoolingControllerTest < ActionController::TestCase
   end
 
   test "locate_group" do
-    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] })
+    put(:load_cars, params: { cars: [{ id: 1, seats: 4 }, { id: 2, seats: 6 }] }, as: :json)
     post(:perform_journey, params: { id: 1, people: 4 })
     post(:perform_journey, params: { id: 2, people: 5 })
     post(:perform_journey, params: { id: 3, people: 3 })
+    @request.content_type = 'application/x-www-form-urlencoded'
 
     # Return car data when the group is assigned to a car
-    post(:locate_group, params: { id: 1 })
+    post(:locate_group, params: { ID: 1 })
     assert_response 200
     car = JSON.parse(@response.body)
     assert_equal(1, car['id'])
     assert_equal(4, car['seats'])
 
     # When the group is waiting to be assigned to a car
-    post(:locate_group, params: { id: 3 })
+    post(:locate_group, params: { ID: 3 })
     assert_response 204
 
     # When the group is not to be found
-    post(:locate_group, params: { id: 4 })
+    post(:locate_group, params: { ID: 4 })
     assert_response 404
 
     # When there is a failure in the request

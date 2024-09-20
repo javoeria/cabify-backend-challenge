@@ -218,3 +218,48 @@ following survey:
 - https://forms.gle/EzPeURspTCLG1q9T7
 
 Your participation is really important. Thanks for your contribution!
+
+## :man_technologist: Submission
+
+The REST API application is created with Ruby 3.3.3 and Rails 7.1.4.
+
+The solution meets the challenge's requirements of being self-contained and not using a database.
+
+**Key Design Choices**
+
+- Cars and groups are stored in hash maps, allowing fast lookups and in-memory data modifications.
+  This is essential for efficiently handling large numbers of elements.
+- The controller `CarPoolingController` delegates operations to the service `CarPoolingService`,
+  stored as a class variable to ensure data consistency across requests.
+- To handle concurrent requests, all operations use a semaphore `Mutex` to manage access to shared data.
+
+**Development Tools**
+
+- I have used [Apipie gem](https://github.com/Apipie/apipie-rails) to describe endpoints and validate parameters.
+  The documentation is available in `/apipie` route.
+- I have used [SimpleCov gem](https://github.com/simplecov-ruby/simplecov) to gather code coverage data.
+  I have created 10 tests with 42 assertions in total, each targeting different workflows for comprehensive validation.
+- Dockerfile has been fully modified to install dependencies and run the Rails server on port 9091.
+
+```console
+$ /harness --address http://pooling:9091 acceptance
+Running suite 1/1: "Acceptance" with 17 assertions
+    1/17: "Accepts valid PUT cars request"
+    2/17: "Rejects invalid JSON cars request"
+    3/17: "Rejects invalid content type cars request"
+    4/17: "Rejects invalid method cars request"
+    5/17: "Accepts valid POST journey request"
+    6/17: "Rejects invalid JSON journey request"
+    7/17: "Rejects invalid content type journey request"
+    8/17: "Rejects invalid method journey request"
+    9/17: "Accepts valid POST dropoff request"
+    10/17: "Rejects invalid form dropoff request"
+    11/17: "Rejects invalid content type dropoff request"
+    12/17: "Rejects invalid method dropoff request"
+    13/17: "Accepts valid POST locate request"
+    14/17: "Returns valid payload for POST locate request"
+    15/17: "Rejects invalid form locate request"
+    16/17: "Rejects invalid content type locate request"
+    17/17: "Rejects invalid method locate request"
+Job succeeded
+```
